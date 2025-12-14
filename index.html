@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Abubeker Ahmedel — JavaScript OS Portfolio</title>
+</head>
+<body>
+
+<script>
+/* ================================================================
+   ABUBEKER AHMEDEL — FULL JAVASCRIPT PORTFOLIO OPERATING SYSTEM
+   50× UPGRADED VERSION — MOVABLE WINDOWS + DOCK + APPS + THEMES
+   Everything in this file is created by JavaScript only.
+==================================================================*/
+
+/* ====== PERSONAL DATA (Editable by you) ====== */
+const USER = {
+  name: "Abubeker Ahmedel",
+  title: "Full-Stack Developer",
+  email: "iamworkinghardly",
+  location: "Addis Ababa, Ethiopia",
+  skills: ["JavaScript", "Node.js", "React", "HTML", "CSS", "PHP", "MySQL", "APIs", "Debugging", "Full-Stack Architecture"],
+  projects: [
+    { name: "Job Tracker Pro", desc: "Advanced job tracking app using local storage & analytics." },
+    { name: "E-Commerce Storefront", desc: "Fully dynamic store interface with filtering & cart system." },
+    { name: "Portfolio Generator", desc: "Creates professional CVs directly in the browser." }
+  ]
+};
+
+/* ====== Inject Global Styles (created by JS only) ====== */
+const style = document.createElement("style");
+style.textContent = `
+  *{box-sizing:border-box;margin:0;padding:0;font-family:Inter, sans-serif;}
+  body{background:#0b0f19;overflow:hidden;user-select:none;}
+  #desktop{position:fixed;inset:0;background:linear-gradient(145deg,#020617,#0f172a);}
+  .window{
+    position:absolute;background:#111827;border:1px solid #1f2937;
+    padding:0;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,0.4);
+    color:white;width:380px;min-height:200px;overflow:hidden;
+  }
+  .titlebar{
+    background:#1e293b;padding:8px 12px;cursor:grab;font-weight:700;
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  .closebtn{
+    width:18px;height:18px;border-radius:50%;background:#ef4444;cursor:pointer;
+  }
+  .content{padding:16px;color:#cbd5e1;font-size:15px;line-height:1.5;}
+  #dock{
+    position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+    background:rgba(255,255,255,0.06);backdrop-filter:blur(20px);
+    padding:10px 18px;border-radius:14px;display:flex;gap:16px;
+  }
+  .dockItem{
+    background:rgba(255,255,255,0.1);padding:12px;border-radius:12px;
+    cursor:pointer;font-size:14px;font-weight:600;color:white;
+    transition:0.2s;
+  }
+  .dockItem:hover{transform:scale(1.15);background:rgba(255,255,255,0.18);}
+  .skill{padding:6px 10px;background:#1e293b;margin:4px 0;border-radius:6px;font-size:14px;}
+  .project{padding:10px;background:#1f2937;margin:6px 0;border-radius:6px;}
+  #terminalText{white-space:pre-line;font-family:monospace;color:#22d3ee;}
+`;
+document.head.appendChild(style);
+
+/* ====== Initialize Desktop ====== */
+const desktop = document.createElement("div");
+desktop.id = "desktop";
+document.body.appendChild(desktop);
+
+/* ====== Utility: Create Movable Window ====== */
+function createWindow(title, innerHTML, x = 100, y = 100){
+  const win = document.createElement("div");
+  win.className = "window";
+  win.style.left = x+"px";
+  win.style.top = y+"px";
+
+  const bar = document.createElement("div");
+  bar.className = "titlebar";
+  bar.innerHTML = title;
+
+  const close = document.createElement("div");
+  close.className = "closebtn";
+  close.onclick = ()=> win.remove();
+  bar.appendChild(close);
+
+  const content = document.createElement("div");
+  content.className = "content";
+  content.innerHTML = innerHTML;
+
+  win.appendChild(bar);
+  win.appendChild(content);
+  desktop.appendChild(win);
+
+  // Drag movement
+  let offsetX, offsetY, dragging=false;
+  bar.onmousedown = e => {
+    dragging=true;
+    offsetX = e.clientX - win.offsetLeft;
+    offsetY = e.clientY - win.offsetTop;
+    bar.style.cursor="grabbing";
+  };
+  document.onmousemove = e=>{
+    if(!dragging) return;
+    win.style.left = (e.clientX-offsetX)+"px";
+    win.style.top = (e.clientY-offsetY)+"px";
+  };
+  document.onmouseup = ()=>{ dragging=false; bar.style.cursor="grab"; };
+
+  return win;
+}
+
+/* ====== Apps ====== */
+
+// ABOUT ME APP
+function openAbout(){
+  createWindow("About Me",
+    `<h2>${USER.name}</h2>
+     <p>${USER.title}</p>
+     <p>Email: ${USER.email}</p>
+     <p>Location: ${USER.location}</p>
+     <p style="margin-top:10px;">Hard-working full-stack developer passionate about building real world solutions.</p>`
+  , 120, 120);
+}
+
+// SKILLS APP
+function openSkills(){
+  createWindow("Skills",
+    USER.skills.map(s=>`<div class="skill">${s}</div>`).join("")
+  , 200, 160);
+}
+
+// PROJECTS APP
+function openProjects(){
+  createWindow("Projects",
+    USER.projects.map(p=>`
+      <div class="project">
+        <strong>${p.name}</strong><br>
+        <span style="color:#94a3b8">${p.desc}</span>
+      </div>
+    `).join("")
+  , 260, 200);
+}
+
+// TERMINAL APP
+function openTerminal(){
+  const term = createWindow("Terminal", `<div id="terminalText"></div>`, 150, 220);
+  const text = [
+    "Initializing system...",
+    "Loading profile...",
+    `User: ${USER.name}`,
+    "Role: Full-Stack Developer",
+    "Status: READY",
+    "",
+    "Type 'skills', 'projects', or 'about' — (demo only)"
+  ];
+  let i=0;
+  function type(){
+    if(i<text.length){
+      document.getElementById("terminalText").innerHTML += text[i]+"\n";
+      i++;
+      setTimeout(type, 180);
+    }
+  }
+  type();
+}
+
+// SETTINGS APP (theme switch)
+function openSettings(){
+  createWindow("Settings",
+    `<button id="themeBtn" style="
+       padding:10px 14px;background:#4f46e5;color:white;
+       border:none;border-radius:8px;cursor:pointer;font-weight:600;">
+       Toggle Light/Dark Theme
+     </button>`
+  , 300, 140);
+
+  document.getElementById("themeBtn").onclick = ()=>{
+    const isDark = document.body.style.background === "";
+    if(isDark){
+      document.body.style.background = "white";
+      desktop.style.background = "#f0f0f0";
+    } else {
+      document.body.style.background = "";
+      desktop.style.background = "";
+    }
+  };
+}
+
+/* ====== Create Dock ====== */
+const dock = document.createElement("div");
+dock.id = "dock";
+dock.innerHTML = `
+  <div class="dockItem" onclick="openAbout()">About</div>
+  <div class="dockItem" onclick="openSkills()">Skills</div>
+  <div class="dockItem" onclick="openProjects()">Projects</div>
+  <div class="dockItem" onclick="openTerminal()">Terminal</div>
+  <div class="dockItem" onclick="openSettings()">Settings</div>
+`;
+document.body.appendChild(dock);
+
+/* ====== Auto-open intro windows ====== */
+setTimeout(()=> openTerminal(), 400);
+setTimeout(()=> openAbout(), 1000);
+
+</script>
+
+</body>
+</html>
